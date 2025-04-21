@@ -36,6 +36,22 @@ public class FlowNetwork {
         }
     }
 
+    /**
+     * Adds a directed edge from the source node to the target node with the given capacity
+     *
+     * @param fromNode the source node
+     * @param toNode the target node
+     * @param capacity the capacity of the edge
+     */
+    public void addEdge(int fromNode, int toNode, int capacity) {
+        Edge forwardEdge = new Edge(toNode, capacity);
+        Edge backwardEdge = new Edge(fromNode, 0);
+        forwardEdge.setResidualEdge(backwardEdge);
+        backwardEdge.setResidualEdge(forwardEdge);
+        adjacencyList.get(fromNode).add(forwardEdge);
+        adjacencyList.get(toNode).add(backwardEdge);
+    }
+
     public int getNumberOfNodes() {
         return numberOfNodes;
     }
