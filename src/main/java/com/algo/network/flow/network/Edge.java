@@ -1,5 +1,5 @@
 /**
- *
+ * Represents an edge in the flow network
  * Author: Soshan Wijayarathne
  * IIT id: 20230427
  * UOW id: w2051662
@@ -50,5 +50,15 @@ public class Edge {
 
     public void setResidualEdge(Edge residualEdge) {
         this.residualEdge = residualEdge;
+    }
+
+    @Override
+    public String toString() {
+        return "Edge{" +
+                "targetNode=" + targetNode +
+                ", capacity=" + capacity +
+                ", flow=" + flow +
+                ", residualEdge=" + residualEdge +
+                '}';
     }
 }
