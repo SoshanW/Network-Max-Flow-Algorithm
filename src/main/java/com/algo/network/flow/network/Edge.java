@@ -52,10 +52,6 @@ public class Edge {
         this.residualEdge = residualEdge;
     }
 
-    public int getResidualCapacity() {
-        return capacity - flow;
-    }
-
     @Override
     public String toString() {
         return "Edge{" +
@@ -66,5 +62,26 @@ public class Edge {
                 '}';
     }
 
+    /**
+     * Returns residual capacity of this edge
+     *
+     * @return the remaining capacity
+     */
+    public int getResidualCapacity() {
+        return capacity - flow;
+    }
+
+    /**
+     * Augments the flow along this edge by the specified bottleneck value
+     *
+     * @param bottleneckCapacity
+     */
+    public void augmentFlow(int bottleneckCapacity) {
+        this.flow += bottleneckCapacity;
+        if(residualEdge != null) {
+            residualEdge.flow -= bottleneckCapacity;
+        }
+    }
 
 }
+
