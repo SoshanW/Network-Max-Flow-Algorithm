@@ -10,10 +10,7 @@ package com.algo.network.flow.algorithm;
 import com.algo.network.flow.network.Edge;
 import com.algo.network.flow.network.FlowNetwork;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * The FordFulkerson class provides a method to compute the maximum flow in a  flow network using the Edmonds-Karp algorithm
@@ -59,13 +56,29 @@ public class FordFulkerson {
                 if (parent[nextNode] == -1 && edge.getResidualCapacity() > 0) {
                     parent[nextNode] = currentNode;
                     if(nextNode == network.getSinkNode()){
-                        //have to return a method to build the augmented path from the parent array.
+                        buildAugmentedPathFromParent(parent, network.getSinkNode());
                     }
                     queue.add(nextNode);
                 }
             }
         }
         return null;
+    }
+
+    /**
+     * Build the augmenting path from the parent array
+     *
+     * @param parent the parent array
+     * @param sinkNode the sink node
+     * @return the augmenting path as a list of node indices
+     */
+    private static List<Integer> buildAugmentedPathFromParent(int[] parent, int sinkNode) {
+        List<Integer> path = new ArrayList<Integer>();
+        for (int node = sinkNode; node != -2; node = parent[node]) {
+            path.add(node);
+        }
+        Collections.reverse(path);
+        return path;
     }
 
 
