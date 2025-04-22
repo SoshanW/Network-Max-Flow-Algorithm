@@ -6,14 +6,13 @@
  */
 package com.algo.network.flow.algorithm;
 
-
 import com.algo.network.flow.network.Edge;
 import com.algo.network.flow.network.FlowNetwork;
 
 import java.util.*;
 
 /**
- * The FordFulkerson class provides a method to compute the maximum flow in a  flow network using the Edmonds-Karp algorithm
+ * The FordFulkerson class provides a method to compute the maximum flow in a flow network using the Edmonds-Karp algorithm
  */
 public class FordFulkerson {
 
@@ -23,11 +22,11 @@ public class FordFulkerson {
      * @param network the flow network
      * @return the value of the maximum flow
      */
-    public static int computeMaximumFlow(FlowNetwork network){
+    public static int computeMaximumFlow(FlowNetwork network) {
         int maxFlow = 0;
         List<Integer> augmentingPath;
 
-        while((augmentingPath = findAugmentingPath(network))!=null){
+        while ((augmentingPath = findAugmentingPath(network)) != null) {
             int bottleneck = findBottleneckCapacity(network, augmentingPath);
             updateResidualCapacities(network, augmentingPath, bottleneck);
             maxFlow += bottleneck;
@@ -40,29 +39,40 @@ public class FordFulkerson {
      * Finds an augmenting path using BFS and returns the path as a list of node indices
      *
      * @param network the flow network
-     * @return the augmenting path or null of none exists
+     * @return the augmenting path or null if none exists
      */
     private static List<Integer> findAugmentingPath(FlowNetwork network) {
         int[] parent = new int[network.getNumberOfNodes()];
         Arrays.fill(parent, -1);
         Queue<Integer> queue = new LinkedList<Integer>();
         queue.add(network.getSourceNode());
-        parent[network.getSourceNode()] = -2;
+        parent[network.getSourceNode()] = -2;  // Special value to mark source
 
-        while (!queue.isEmpty()) {
+        boolean foundPath = false;
+        while (!queue.isEmpty() && !foundPath) {
             int currentNode = queue.poll();
-            for(Edge edge: network.getAdjacencyList().get(currentNode)){
+
+            for (Edge edge : network.getAdjacencyList().get(currentNode)) {
                 int nextNode = edge.getTargetNode();
                 if (parent[nextNode] == -1 && edge.getResidualCapacity() > 0) {
                     parent[nextNode] = currentNode;
-                    if(nextNode == network.getSinkNode()){
-                        return buildAugmentedPathFromParent(parent, network.getSinkNode());
-                    }
                     queue.add(nextNode);
+
+                    // If we've reached the sink, we've found a path
+                    if (nextNode == network.getSinkNode()) {
+                        foundPath = true;
+                        break;
+                    }
                 }
             }
         }
-        return null;
+
+        // If we found a path to the sink, reconstruct and return it
+        if (parent[network.getSinkNode()] != -1) {
+            return buildAugmentedPathFromParent(parent, network.getSinkNode());
+        }
+
+        return null;  // No augmenting path found
     }
 
     /**
@@ -82,7 +92,7 @@ public class FordFulkerson {
     }
 
     /**
-     * Finds the bottleneck capacity along the given the path
+     * Finds the bottleneck capacity along the given path
      *
      * @param network the flow network
      * @param path the augmenting path
@@ -90,13 +100,13 @@ public class FordFulkerson {
      */
     private static int findBottleneckCapacity(FlowNetwork network, List<Integer> path) {
         int bottleneckCapacity = Integer.MAX_VALUE;
-        for (int i=0; i<path.size() - 1; i++){
+        for (int i = 0; i < path.size() - 1; i++) {
             int fromNode = path.get(i);
-            int toNode = path.get(i+1);
-            for (Edge edge: network.getAdjacencyList().get(fromNode)) {
+            int toNode = path.get(i + 1);
+            for (Edge edge : network.getAdjacencyList().get(fromNode)) {
                 if (edge.getTargetNode() == toNode && edge.getResidualCapacity() > 0) {
                     bottleneckCapacity = Math.min(bottleneckCapacity, edge.getResidualCapacity());
-                    break;
+                    break;  // Found the right edge, no need to keep searching
                 }
             }
         }
@@ -104,21 +114,30 @@ public class FordFulkerson {
     }
 
     /**
-     * Updated residual capacities along the augmenting path
+     * Updates residual capacities along the augmenting path
      *
      * @param network the flow network
      * @param path the augmenting path
      * @param bottleneckCapacity the bottleneck capacity
      */
-    private static void updateResidualCapacities (FlowNetwork network, List<Integer> path, int bottleneckCapacity) {
-        for (int i=0; i<path.size()-1; i++){
+    private static void updateResidualCapacities(FlowNetwork network, List<Integer> path, int bottleneckCapacity) {
+        for (int i = 0; i < path.size() - 1; i++) {
             int fromNode = path.get(i);
-            int toNode = path.get(i+1);
-            for (Edge edge: network.getAdjacencyList().get(fromNode)) {
-                if (edge.getTargetNode() == toNode && edge.getResidualCapacity() >= bottleneckCapacity) {
+            int toNode = path.get(i + 1);
+            boolean edgeFound = false;
+
+            // Update forward edge
+            for (Edge edge : network.getAdjacencyList().get(fromNode)) {
+                if (edge.getTargetNode() == toNode && edge.getResidualCapacity() > 0) {
                     edge.augmentFlow(bottleneckCapacity);
+                    edgeFound = true;
                     break;
                 }
+            }
+
+            if (!edgeFound) {
+                // This should not happen if our path finding is correct
+                System.err.println("Error: Could not find edge from " + fromNode + " to " + toNode);
             }
         }
     }
@@ -131,14 +150,12 @@ public class FordFulkerson {
      */
     private static void printAugmentingPath(List<Integer> path, int bottleneckCapacity) {
         System.out.println("Augmenting path: ");
-        for (int i=0; i<path.size(); i++){
+        for (int i = 0; i < path.size(); i++) {
             System.out.print(path.get(i));
-            if (i != path.size()-1){
+            if (i != path.size() - 1) {
                 System.out.print(" -> ");
             }
         }
         System.out.println(" | Bottleneck Capacity: " + bottleneckCapacity);
     }
-
-
 }

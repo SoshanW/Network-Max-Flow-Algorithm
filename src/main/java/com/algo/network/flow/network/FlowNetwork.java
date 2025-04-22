@@ -46,8 +46,12 @@ public class FlowNetwork {
     public void addEdge(int fromNode, int toNode, int capacity) {
         Edge forwardEdge = new Edge(toNode, capacity);
         Edge backwardEdge = new Edge(fromNode, 0);
+
+        //set residual edges
         forwardEdge.setResidualEdge(backwardEdge);
         backwardEdge.setResidualEdge(forwardEdge);
+
+        //add edges to adjacency list
         adjacencyList.get(fromNode).add(forwardEdge);
         adjacencyList.get(toNode).add(backwardEdge);
     }
