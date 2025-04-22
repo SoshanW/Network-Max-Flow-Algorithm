@@ -28,9 +28,9 @@ public class FordFulkerson {
         List<Integer> augmentingPath;
 
         while((augmentingPath = findAugmentingPath(network))!=null){
-            //have to find bottleneck
-            //update the redisual path
-            //add bottleneck to the maxflow
+            int bottleneck = findBottleneckCapacity(network, augmentingPath);
+            updateResidualCapacities(network, augmentingPath, bottleneck);
+            maxFlow += bottleneck;
             //print augmenting path
         }
         return maxFlow;
@@ -79,6 +79,47 @@ public class FordFulkerson {
         }
         Collections.reverse(path);
         return path;
+    }
+
+    /**
+     * Finds the bottleneck capacity along the given the path
+     *
+     * @param network the flow network
+     * @param path the augmenting path
+     * @return the bottleneck capacity
+     */
+    private static int findBottleneckCapacity(FlowNetwork network, List<Integer> path) {
+        int bottleneckCapacity = Integer.MAX_VALUE;
+        for (int i=0; i<path.size(); i++){
+            int fromNode = path.get(i);
+            int toNode = path.get(i+1);
+            for (Edge edge: network.getAdjacencyList().get(fromNode)) {
+                if (edge.getTargetNode() == toNode && edge.getResidualCapacity() > 0) {
+                    bottleneckCapacity = Math.min(bottleneckCapacity, edge.getResidualCapacity());
+                }
+            }
+        }
+        return bottleneckCapacity;
+    }
+
+    /**
+     * Updated residual capacities along the augmenting path
+     *
+     * @param network the flow network
+     * @param path the augmenting path
+     * @param bottleneckCapacity the bottleneck capacity
+     */
+    private static void updateResidualCapacities (FlowNetwork network, List<Integer> path, int bottleneckCapacity) {
+        for (int i=0; i<path.size()-1; i++){
+            int fromNode = path.get(i);
+            int toNode = path.get(i+1);
+            for (Edge edge: network.getAdjacencyList().get(fromNode)) {
+                if (edge.getTargetNode() == toNode && edge.getResidualCapacity() >= bottleneckCapacity) {
+                    edge.augmentFlow(bottleneckCapacity);
+                    break;
+                }
+            }
+        }
     }
 
 
