@@ -52,6 +52,10 @@ public class Edge {
         this.residualEdge = residualEdge;
     }
 
+    public int getResidualCapacity() {
+        return capacity - flow;
+    }
+
     @Override
     public String toString() {
         return "Edge{" +
@@ -61,4 +65,6 @@ public class Edge {
                 ", residualEdge=" + residualEdge +
                 '}';
     }
+
+
 }
