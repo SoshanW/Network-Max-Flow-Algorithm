@@ -20,7 +20,7 @@ public class Main {
      * @param args command-line arguments
      */
     public static void main(String[] args) {
-        String filename = "network.txt";
+        String filename = "input/network.txt";
 
         try{
             FlowNetwork flowNetwork = Parser.parseFlowNetwork(filename);
