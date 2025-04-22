@@ -56,7 +56,7 @@ public class FordFulkerson {
                 if (parent[nextNode] == -1 && edge.getResidualCapacity() > 0) {
                     parent[nextNode] = currentNode;
                     if(nextNode == network.getSinkNode()){
-                        buildAugmentedPathFromParent(parent, network.getSinkNode());
+                        return buildAugmentedPathFromParent(parent, network.getSinkNode());
                     }
                     queue.add(nextNode);
                 }
@@ -90,12 +90,13 @@ public class FordFulkerson {
      */
     private static int findBottleneckCapacity(FlowNetwork network, List<Integer> path) {
         int bottleneckCapacity = Integer.MAX_VALUE;
-        for (int i=0; i<path.size(); i++){
+        for (int i=0; i<path.size() - 1; i++){
             int fromNode = path.get(i);
             int toNode = path.get(i+1);
             for (Edge edge: network.getAdjacencyList().get(fromNode)) {
                 if (edge.getTargetNode() == toNode && edge.getResidualCapacity() > 0) {
                     bottleneckCapacity = Math.min(bottleneckCapacity, edge.getResidualCapacity());
+                    break;
                 }
             }
         }
