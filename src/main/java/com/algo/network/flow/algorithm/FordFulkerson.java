@@ -31,7 +31,7 @@ public class FordFulkerson {
             int bottleneck = findBottleneckCapacity(network, augmentingPath);
             updateResidualCapacities(network, augmentingPath, bottleneck);
             maxFlow += bottleneck;
-            //print augmenting path
+            printAugmentingPath(augmentingPath, bottleneck);
         }
         return maxFlow;
     }
@@ -120,6 +120,23 @@ public class FordFulkerson {
                 }
             }
         }
+    }
+
+    /**
+     * Prints the augmenting path and its bottleneck capacity.
+     *
+     * @param path the augmenting path
+     * @param bottleneckCapacity the bottleneck capacity
+     */
+    private static void printAugmentingPath(List<Integer> path, int bottleneckCapacity) {
+        System.out.println("Augmenting path: ");
+        for (int i=0; i<path.size(); i++){
+            System.out.print(path.get(i));
+            if (i != path.size()-1){
+                System.out.print(" -> ");
+            }
+        }
+        System.out.println(" | Bottleneck Capacity: " + bottleneckCapacity);
     }
 
 
