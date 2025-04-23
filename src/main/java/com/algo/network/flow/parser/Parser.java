@@ -38,16 +38,43 @@ public class Parser {
             FlowNetwork network = new FlowNetwork(numberOfNodes, sourceNode, sinkNode);
 
             String line;
+            int lineNumber = 1; //for error handling purposes if in the sense a user adds invalid line number for input.txt
             while((line = reader.readLine()) != null) {
+                lineNumber++;
                 String[] tokens = line.trim().split("\\s+");
                 if (tokens.length != 3) {
+                    System.out.println("Warning: Line " + lineNumber + " is malformed and will be ignored. Expected 3 values but got " + tokens.length);
                     continue; //ignore malformed lines
                 }
-                int fromNode = Integer.parseInt(tokens[0]);
-                int toNode = Integer.parseInt(tokens[1]);
-                int capacity = Integer.parseInt(tokens[2]);
-                network.addEdge(fromNode, toNode, capacity);
+
+                try {
+                    int fromNode = Integer.parseInt(tokens[0]);
+                    int toNode = Integer.parseInt(tokens[1]);
+                    int capacity = Integer.parseInt(tokens[2]);
+
+                    // Validate node indices before adding the edge
+                    if (fromNode < 0 || fromNode >= numberOfNodes) {
+                        System.out.println("Warning: Line " + lineNumber + " has invalid 'from' node " + fromNode +
+                                ". Node indices must be between 0 and " + (numberOfNodes - 1) + ". This edge will be ignored.");
+                        continue;
+                    }
+                    if (toNode < 0 || toNode >= numberOfNodes) {
+                        System.out.println("Warning: Line " + lineNumber + " has invalid 'to' node " + toNode +
+                                ". Node indices must be between 0 and " + (numberOfNodes - 1) + ". This edge will be ignored.");
+                        continue;
+                    }
+                    if (capacity < 0) {
+                        System.out.println("Warning: Line " + lineNumber + " has negative capacity " + capacity +
+                                ". Capacity must be non-negative. This edge will be ignored.");
+                        continue;
+                    }
+
+                    network.addEdge(fromNode, toNode, capacity);
+                } catch (NumberFormatException e) {
+                    System.out.println("Warning: Line " + lineNumber + " contains non-integer values and will be ignored.");
+                }
             }
+
             return network;
         }
     }
