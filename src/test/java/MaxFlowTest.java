@@ -15,8 +15,17 @@ public class MaxFlowTest {
 
     private static Stream<Arguments> provideTestCases() {
         return Stream.of(
-                // Format: (input-file-path, expected-max-flow)
-                Arguments.of("src/test/resources/test1.txt", 3)
+
+                Arguments.of("src/test/resources/test1.txt", 3),
+                Arguments.of("src/test/resources/test2.txt", 5),
+                Arguments.of("src/test/resources/test3.txt", 0),
+                Arguments.of("src/test/resources/test4.txt", 8),
+                Arguments.of("src/test/resources/test5.txt", 15),
+                Arguments.of("src/test/resources/test6.txt", 3),
+                Arguments.of("src/test/resources/test7.txt", 100),
+                Arguments.of("src/test/resources/test8.txt", 2000),
+                Arguments.of("src/test/resources/test9.txt", 0),
+                Arguments.of("src/test/resources/test10.txt", 23)
 
         );
     }
@@ -27,10 +36,10 @@ public class MaxFlowTest {
         // Arrange: Parse the network from file
         FlowNetwork network = Parser.parseFlowNetwork(inputFile);
 
-        // Act: Compute maximum flow
+        // Compute maximum flow
         int actualFlow = FordFulkerson.computeMaximumFlow(network);
 
-        // Assert: Verify expected result
+        // Verify expected result
         assertEquals(expectedFlow, actualFlow,
                 "Incorrect max flow for " + inputFile);
     }
