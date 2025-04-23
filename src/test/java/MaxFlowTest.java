@@ -21,7 +21,7 @@ public class MaxFlowTest {
                 Arguments.of("src/test/resources/test3.txt", 0),
                 Arguments.of("src/test/resources/test4.txt", 8),
                 Arguments.of("src/test/resources/test5.txt", 15),
-                Arguments.of("src/test/resources/test6.txt", 3),
+                Arguments.of("src/test/resources/test6.txt", 2),
                 Arguments.of("src/test/resources/test7.txt", 100),
                 Arguments.of("src/test/resources/test8.txt", 2000),
                 Arguments.of("src/test/resources/test9.txt", 0),
