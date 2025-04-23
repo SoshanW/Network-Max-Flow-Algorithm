@@ -1,5 +1,11 @@
-import static org.junit.jupiter.api.Assertions.assertEquals;
+/**
+ * Entry point for the maximum network flow application
+ * Author: Soshan Wijayarathne
+ * IIT id: 20230427
+ * UOW id: w2051662
+ */
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.stream.Stream;
 
