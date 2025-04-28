@@ -22,6 +22,7 @@ public class MaxFlowTest {
     private static Stream<Arguments> provideTestCases() {
         return Stream.of(
 
+//The expected outputs were each test file were AI generated. These outputs will be used to check whether the output given by the code is accurate
                 Arguments.of("src/test/resources/test1.txt", 3),
                 Arguments.of("src/test/resources/test2.txt", 5),
                 Arguments.of("src/test/resources/test3.txt", 0),
