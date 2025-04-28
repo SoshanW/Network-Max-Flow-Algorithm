@@ -15,8 +15,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -226,7 +227,7 @@ public class Main {
     }
 
     /**
-     * Gets a list of all files in the input directory
+     * Gets a list of all files in the input directory, sorted in natural order
      *
      * @return List of filenames in the input directory
      * @throws IOException if the directory cannot be accessed
@@ -241,11 +242,16 @@ public class Main {
         }
 
         try (Stream<Path> paths = Files.list(inputPath)) {
-            return paths
+            List<String> fileNames = paths
                     .filter(Files::isRegularFile)
                     .map(path -> path.getFileName().toString())
                     .filter(name -> name.endsWith(".txt"))
                     .collect(Collectors.toList());
+
+            // Sort filenames using natural order comparator
+            Collections.sort(fileNames, new NaturalOrderComparator());
+
+            return fileNames;
         }
     }
 
@@ -265,5 +271,62 @@ public class Main {
         System.out.println("\nCalculating maximum flow...");
         int maxFlow = FordFulkerson.computeMaximumFlow(flowNetwork);
         System.out.println("\nMaximum flow: " + maxFlow);
+    }
+
+    /**
+     * A comparator that implements natural ordering for strings.
+     * This will sort strings like "bridge_1.txt" before "bridge_2.txt" and "bridge_10.txt" after "bridge_9.txt"
+     */
+    static class NaturalOrderComparator implements Comparator<String> {
+        private static final Pattern NUMBERS = Pattern.compile("(\\d+)");
+
+        @Override
+        public int compare(String s1, String s2) {
+            // Find all numbers in both strings
+            Matcher m1 = NUMBERS.matcher(s1);
+            Matcher m2 = NUMBERS.matcher(s2);
+
+            // Position where we are in each string
+            int pos1 = 0;
+            int pos2 = 0;
+
+            while (true) {
+                // Find the next number in each string
+                boolean b1 = m1.find(pos1);
+                boolean b2 = m2.find(pos2);
+
+                // If no more numbers in one or both strings
+                if (!b1 && !b2) {
+                    // No more numbers, compare the remaining text
+                    return s1.substring(pos1).compareTo(s2.substring(pos2));
+                }
+                if (!b1) {
+                    return -1; // s1 has no more numbers, so it comes first
+                }
+                if (!b2) {
+                    return 1;  // s2 has no more numbers, so it comes first
+                }
+
+                // Compare the text before the numbers
+                String before1 = s1.substring(pos1, m1.start());
+                String before2 = s2.substring(pos2, m2.start());
+                int comp = before1.compareTo(before2);
+                if (comp != 0) {
+                    return comp;
+                }
+
+                // Compare the numbers themselves
+                int num1 = Integer.parseInt(m1.group(1));
+                int num2 = Integer.parseInt(m2.group(1));
+                comp = Integer.compare(num1, num2);
+                if (comp != 0) {
+                    return comp;
+                }
+
+                // Update positions and continue
+                pos1 = m1.end();
+                pos2 = m2.end();
+            }
+        }
     }
 }
