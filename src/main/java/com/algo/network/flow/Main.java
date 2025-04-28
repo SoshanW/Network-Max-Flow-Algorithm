@@ -43,6 +43,7 @@ public class Main {
                     processDefaultFile();
                     break;
                 case 2:
+                    processAllFiles(scanner);
                     break;
                 case 3:
                     processSpecificFile(scanner);
@@ -109,6 +110,63 @@ public class Main {
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Processes all files in the input directory with yes/no confirmation between files
+     *
+     * @param scanner the input scanner to use for user input
+     */
+    private static void processAllFiles(Scanner scanner) {
+        try {
+            List<String> inputFiles = getInputFiles();
+
+            if (inputFiles.isEmpty()) {
+                System.out.println("No files found in the input directory.");
+                return;
+            }
+
+            System.out.println("\nBeginning batch processing of files in input folder:");
+
+            for (int i = 0; i < inputFiles.size(); i++) {
+                String currentFile = inputFiles.get(i);
+                System.out.println("\n===== Processing file " + (i+1) + "/" + inputFiles.size() + ": " + currentFile + " =====");
+
+                try {
+                    processFile(INPUT_DIRECTORY + File.separator + currentFile);
+                } catch (Exception e) {
+                    System.out.println("ERROR processing " + currentFile + ": " + e.getMessage());
+                }
+
+                // If this is the last file, break out of the loop
+                if (i == inputFiles.size() - 1) {
+                    System.out.println("\nAll files processed.");
+                    break;
+                }
+
+                // Ask if the user wants to process the next file
+                String nextFile = inputFiles.get(i + 1);
+                System.out.println("\nNext file: " + nextFile);
+                boolean validResponse = false;
+                while (!validResponse) {
+                    System.out.print("Do you want to process this file? (y/n): ");
+                    String response = scanner.nextLine().trim().toLowerCase();
+
+                    if (response.equals("y") || response.equals("yes")) {
+                        validResponse = true;
+                        // Continue to the next iteration
+                    } else if (response.equals("n") || response.equals("no")) {
+                        validResponse = true;
+                        System.out.println("Stopping batch processing and returning to menu.");
+                        return; // Return to the menu
+                    } else {
+                        System.out.println("Invalid input. Please enter 'y' for yes or 'n' for no.");
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("ERROR: Could not access input directory. " + e.getMessage());
         }
     }
 
