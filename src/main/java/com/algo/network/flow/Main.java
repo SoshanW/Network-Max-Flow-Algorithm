@@ -12,9 +12,13 @@ import com.algo.network.flow.parser.Parser;
 
 import java.io.File;
 import java.io.IOException;
-
-import java.util.*;
-
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Main {
 
@@ -41,6 +45,7 @@ public class Main {
                 case 2:
                     break;
                 case 3:
+                    processSpecificFile(scanner);
                     break;
                 case 4:
                     running = false;
@@ -107,8 +112,84 @@ public class Main {
         }
     }
 
+    /**
+     * Processes a specific file chosen by the user
+     *
+     * @param scanner the input scanner
+     */
+    private static void processSpecificFile(Scanner scanner) {
+        try {
+            List<String> inputFiles = getInputFiles();
 
+            if (inputFiles.isEmpty()) {
+                System.out.println("No files found in the input directory.");
+                return;
+            }
 
+            System.out.println("\nAvailable files in input folder:");
+            for (int i = 0; i < inputFiles.size(); i++) {
+                System.out.println((i + 1) + ". " + inputFiles.get(i));
+            }
+
+            System.out.print("\nEnter file number or filename: ");
+            String input = scanner.nextLine().trim();
+
+            String selectedFile;
+            try {
+                int fileIndex = Integer.parseInt(input) - 1;
+                if (fileIndex >= 0 && fileIndex < inputFiles.size()) {
+                    selectedFile = inputFiles.get(fileIndex);
+                } else {
+                    System.out.println("Invalid file number.");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                // User entered a filename instead of a number
+                selectedFile = input;
+                if (!inputFiles.contains(selectedFile)) {
+                    System.out.println("File '" + selectedFile + "' not found in input directory.");
+                    return;
+                }
+            }
+
+            String filename = INPUT_DIRECTORY + File.separator + selectedFile;
+            System.out.println("\nProcessing file: " + filename);
+            try {
+                processFile(filename);
+                System.out.println("\nFile processing complete.");
+            } catch (Exception e) {
+                System.out.println("ERROR: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+        } catch (IOException e) {
+            System.out.println("ERROR: Could not access input directory. " + e.getMessage());
+        }
+    }
+
+    /**
+     * Gets a list of all files in the input directory
+     *
+     * @return List of filenames in the input directory
+     * @throws IOException if the directory cannot be accessed
+     */
+    private static List<String> getInputFiles() throws IOException {
+        Path inputPath = Paths.get(INPUT_DIRECTORY);
+
+        if (!Files.exists(inputPath)) {
+            System.out.println("Input directory not found. Creating directory.");
+            Files.createDirectories(inputPath);
+            return List.of();
+        }
+
+        try (Stream<Path> paths = Files.list(inputPath)) {
+            return paths
+                    .filter(Files::isRegularFile)
+                    .map(path -> path.getFileName().toString())
+                    .filter(name -> name.endsWith(".txt"))
+                    .collect(Collectors.toList());
+        }
+    }
 
     /**
      * Processes a single file with the Ford-Fulkerson algorithm
@@ -127,6 +208,4 @@ public class Main {
         int maxFlow = FordFulkerson.computeMaximumFlow(flowNetwork);
         System.out.println("\nMaximum flow: " + maxFlow);
     }
-
-
 }
